@@ -13,6 +13,7 @@ class PhotoMapViewController: UIViewController, UIImagePickerControllerDelegate,
     LocationViewControllerDelegate, MKMapViewDelegate {
 
     @IBOutlet weak var mapView: MKMapView!
+    var selectedImage: UIImage!
     override func viewDidLoad() {
         super.viewDidLoad()
         //one degree of latitude is approximately 111 kilometers (69 miles) at all times.
@@ -50,7 +51,7 @@ class PhotoMapViewController: UIViewController, UIImagePickerControllerDelegate,
         // Get the image captured by the UIImagePickerController
         let originalImage = info[UIImagePickerControllerOriginalImage] as! UIImage
         let editedImage = info[UIImagePickerControllerEditedImage] as! UIImage
-        
+        self.selectedImage = originalImage
         // Do something with the images (based on your use case)
         
         // Dismiss UIImagePickerController to go back to your original view controller
@@ -76,6 +77,8 @@ class PhotoMapViewController: UIViewController, UIImagePickerControllerDelegate,
         let annot = MKPointAnnotation()
         annot.coordinate = CLLocationCoordinate2D(latitude: CLLocationDegrees(latitude), longitude: CLLocationDegrees(longitude))
         mapView.addAnnotation(annot)
+        self.navigationController?.popViewController(animated: true)
+        
     }
     
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
@@ -86,10 +89,11 @@ class PhotoMapViewController: UIViewController, UIImagePickerControllerDelegate,
             annotationView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseID)
             annotationView!.canShowCallout = true
             annotationView!.leftCalloutAccessoryView = UIImageView(frame: CGRect(x:0, y:0, width: 50, height:50))
+            annotationView?.image = selectedImage
         }
         
         let imageView = annotationView?.leftCalloutAccessoryView as! UIImageView
-        imageView.image = UIImage(named: "camera")
+        imageView.image = selectedImage
         
         return annotationView
     }
