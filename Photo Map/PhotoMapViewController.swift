@@ -10,7 +10,7 @@ import UIKit
 import MapKit
 
 class PhotoMapViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate,
-    LocationViewControllerDelegate {
+    LocationViewControllerDelegate, MKMapViewDelegate {
 
     @IBOutlet weak var mapView: MKMapView!
     override func viewDidLoad() {
@@ -18,6 +18,7 @@ class PhotoMapViewController: UIViewController, UIImagePickerControllerDelegate,
         //one degree of latitude is approximately 111 kilometers (69 miles) at all times.
         let sfRegion = MKCoordinateRegionMake(CLLocationCoordinate2DMake(37.783333, -122.416667), MKCoordinateSpanMake(0.1, 0.1))
         mapView.setRegion(sfRegion, animated: false)
+        mapView.delegate = self
     }
 
     override func didReceiveMemoryWarning() {
@@ -74,8 +75,22 @@ class PhotoMapViewController: UIViewController, UIImagePickerControllerDelegate,
         print("location picked")
         let annot = MKPointAnnotation()
         annot.coordinate = CLLocationCoordinate2D(latitude: CLLocationDegrees(latitude), longitude: CLLocationDegrees(longitude))
-        
         mapView.addAnnotation(annot)
-        //poptoview
+    }
+    
+    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+        let reuseID = "myAnnotationView"
+        
+        var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: reuseID)
+        if (annotationView == nil) {
+            annotationView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseID)
+            annotationView!.canShowCallout = true
+            annotationView!.leftCalloutAccessoryView = UIImageView(frame: CGRect(x:0, y:0, width: 50, height:50))
+        }
+        
+        let imageView = annotationView?.leftCalloutAccessoryView as! UIImageView
+        imageView.image = UIImage(named: "camera")
+        
+        return annotationView
     }
 }
